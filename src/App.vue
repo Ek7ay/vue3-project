@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <!-- Demo Element Plus button -->
-    <div class="demo-banner">
+    <div class="demo-banner" v-if="false">
       <el-button type="primary" @click="showMessage">Element Plus Button (Click me!)</el-button>
       <span class="demo-text">Less and Element Plus are installed and working!</span>
     </div>
