@@ -8,13 +8,12 @@
         </div>
         <nav class="nav">
           <router-link to="/" class="nav-link active">首页</router-link>
-          <router-link to="/login" class="nav-link">登录</router-link>
           <router-link to="/about" class="nav-link">关于</router-link>
           <router-link to="/services" class="nav-link">服务</router-link>
           <router-link to="/contact" class="nav-link">联系</router-link>
         </nav>
         <div class="user-actions">
-          <button class="btn btn-primary" @click="goToLogin">登录</button>
+          <button class="btn btn-primary" @click="$router.push('/login')">登录</button>
           <button class="btn btn-outline" @click="showSignupModal = true">注册</button>
         </div>
       </div>
@@ -134,7 +133,6 @@
             <h4 class="footer-title">快速链接</h4>
             <ul class="footer-links">
               <li><router-link to="/">首页</router-link></li>
-              <li><router-link to="/login">登录</router-link></li>
               <li><router-link to="/about">关于我们</router-link></li>
               <li><router-link to="/contact">联系我们</router-link></li>
             </ul>
@@ -210,9 +208,6 @@ export default {
     }
   },
   methods: {
-    goToLogin() {
-      this.$router.push('/login')
-    },
     startTutorial() {
       alert('开始教程功能开发中...')
     },

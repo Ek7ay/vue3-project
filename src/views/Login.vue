@@ -133,19 +133,13 @@ export default {
 </style>
 
 <style>
+/* Global styles for login page only */
 html, body {
   height: 100%;
   margin: 0;
   padding: 0;
-  overflow: hidden;
 }
 body {
   box-sizing: border-box;
-  width: 100vw;
-  height: 100vh;
-}
-/* 隐藏所有滚动条 */
-body::-webkit-scrollbar, html::-webkit-scrollbar {
-  display: none;
 }
 </style>
