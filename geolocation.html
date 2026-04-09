@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>获取地理位置</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+            white-space: pre-wrap;
+        }
+        .error {
+            color: #d32f2f;
+        }
+        .success {
+            color: #388e3c;
+        }
+    </style>
+</head>
+<body>
+    <h1>获取地理位置信息</h1>
+    <p>点击下面的按钮获取您当前的地理位置信息：</p>
+    <button id="getLocation">获取位置</button>
+    
+    <div id="result"></div>
+    
+    <script>
+        const resultDiv = document.getElementById('result');
+        const getLocationBtn = document.getElementById('getLocation');
+        
+        getLocationBtn.addEventListener('click', () => {
+            resultDiv.innerHTML = '正在获取位置信息...';
+            resultDiv.className = '';
+            
+            if (!navigator.geolocation) {
+                resultDiv.innerHTML = '您的浏览器不支持地理位置API';
+                resultDiv.className = 'error';
+                return;
+            }
+            
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const { latitude, longitude, accuracy } = position.coords;
+                    const timestamp = new Date(position.timestamp).toLocaleString('zh-CN');
+                    
+                    const result = `
+获取成功！以下是您的位置信息：
+
+📍 经纬度坐标：
+   纬度：${latitude.toFixed(6)}°
+   经度：${longitude.toFixed(6)}°
+   
+📊 精度：${accuracy ? accuracy.toFixed(2) + '米' : '未知'}
+   
+⏰ 获取时间：${timestamp}
+   
+🌍 地图链接：
+   Google地图：https://www.google.com/maps?q=${latitude},${longitude}
+   高德地图：https://uri.amap.com/marker?position=${longitude},${latitude}
+   
+💡 提示：您可以将这些坐标复制到地图应用中查看具体位置。
+                    `;
+                    
+                    resultDiv.innerHTML = result;
+                    resultDiv.className = 'success';
+                    
+                    // 尝试获取地址信息
+                    getAddressFromCoords(latitude, longitude);
+                },
+                (error) => {
+                    let errorMessage = '获取位置失败：';
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                            errorMessage += '用户拒绝了地理位置请求';
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            errorMessage += '位置信息不可用';
+                            break;
+                        case error.TIMEOUT:
+                            errorMessage += '获取位置超时';
+                            break;
+                        default:
+                            errorMessage += '未知错误';
+                    }
+                    resultDiv.innerHTML = errorMessage;
+                    resultDiv.className = 'error';
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                }
+            );
+        });
+        
+        function getAddressFromCoords(lat, lng) {
+            // 使用逆地理编码获取地址信息
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.address) {
+                        const addressInfo = `
+                        
+🏠 地址信息：
+   国家：${data.address.country || '未知'}
+   省份/州：${data.address.state || data.address.province || '未知'}
+   城市：${data.address.city || data.address.town || data.address.village || '未知'}
+   区县：${data.address.county || '未知'}
+   道路：${data.address.road || '未知'}
+   门牌号：${data.address.house_number || '未知'}
+   邮政编码：${data.address.postcode || '未知'}
+                        `;
+                        resultDiv.innerHTML += addressInfo;
+                    }
+                })
+                .catch(err => {
+                    console.log('获取地址信息失败：', err);
+                });
+        }
+        
+        // 自动尝试获取位置
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                getLocationBtn.click();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
